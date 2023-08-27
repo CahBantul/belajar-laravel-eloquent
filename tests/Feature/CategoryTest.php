@@ -58,4 +58,21 @@ class CategoryTest extends TestCase
         $result = $category->update();
         $this->assertTrue($result);
     }
+
+    public function testSelect()
+    {
+        for ($i=0; $i < 5; $i++) { 
+            $category = new Category();
+            $category->id = "id $i";
+            $category->name = "name $i";
+            $category->save();
+        };
+
+        $categories = Category::query()->whereNull("description")->get();
+        $this->assertEquals(5, $categories->count());
+        $categories->each(function ($category){
+            $category->description = "update";
+            $category->update();
+        });
+    }
 }
