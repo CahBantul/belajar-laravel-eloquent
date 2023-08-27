@@ -22,4 +22,17 @@ class CommentTest extends TestCase
         $this->assertNotNull($comment->created_at);
         $this->assertNotNull($comment->updated_at);
     }
+
+    public function testDefaultAttributeValues()
+    {
+        $comment = new Comment();
+        $comment->email = "email@email.com";
+        $comment->save();
+
+        $this->assertNotNull($comment->id);
+        $this->assertNotNull($comment->comment);
+        $this->assertNotNull($comment->title);
+        $this->assertNotNull($comment->created_at);
+        $this->assertNotNull($comment->updated_at);
+    }
 }

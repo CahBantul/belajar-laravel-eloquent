@@ -13,4 +13,9 @@ class Comment extends Model
     protected $primaryKey = "id";
     protected $keyType = "int";
     public $incrementing = true;
+
+    protected $attributes = [
+        "title" => "Sample Title",
+        "comment" => "Sample Comment",
+    ];
 }
