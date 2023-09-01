@@ -3,8 +3,11 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
+use App\Models\Product;
 use App\Models\Scopes\IsActiveScope;
 use Database\Seeders\CategorySeeder;
+use Database\Seeders\ProductSeeder;
+use GuzzleHttp\Handler\Proxy;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -194,5 +197,49 @@ class CategoryTest extends TestCase
 
         $category = Category::query()->withoutGlobalScope(IsActiveScope::class)->find("FOOD");
         $this->assertNotNull($category);
+    }
+
+    public function testOneToMany()
+    {
+        $this->seed([CategorySeeder::class, ProductSeeder::class]);
+        $category = Category::find("FOOD");
+        $this->assertNotNull($category);
+
+        $products = $category->products;
+        $this->assertNotNull($products);
+        $this->assertCount(1, $products);
+    }
+
+    public function testOneToManyQuery()
+    {
+        $category = new Category();
+        $category->id = "FOOD";
+        $category->name = "Food";
+        $category->description = "Food Category";
+        $category->is_active = true;
+        $category->save();
+
+        $product = new Product();
+        $product->id = "1";
+        $product->name = "Product 1";
+        $product->description = "Description Product 1";
+
+        $category->products()->save($product);
+
+        $this->assertNotNull($product->category_id);
+    }
+
+    public function testRelationshipQuery()
+    {
+        $this->seed([CategorySeeder::class, ProductSeeder::class]);
+
+        $category = Category::find("FOOD");
+        $products = $category->products;
+        $this->assertNotNull($products);
+        $this->assertCount(2, $products);
+
+        $productsOutOfStock = $category->products()->where("stock", ">", 0)->get();
+        $this->assertNotNull($productsOutOfStock);
+        $this->assertCount(1, $productsOutOfStock);
     }
 }
